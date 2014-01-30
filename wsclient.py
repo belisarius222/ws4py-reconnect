@@ -14,6 +14,20 @@ class DummyClient(WebSocketClient):
             print i
             self.send("*" * i)
 
+    def setup(self, timeout=1):
+        try:
+            self.__init__(self.url)
+            self.connect()
+            self.run_forever()
+        except KeyboardInterrupt:
+            self.close()
+        except:
+            newTimeout = timeout + 1
+            print "Timing out for %i seconds. . ." % newTimeout
+            time.sleep(newTimeout)
+            print "Attempting reconnect. . ."
+            self.setup(newTimeout)
+
     def closed(self, code, reason=None):
         print "Closed down", code, reason
         print "Timing out for a bit. . ."
@@ -21,12 +35,8 @@ class DummyClient(WebSocketClient):
         print "Reconnecting. . ."
         # self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
-        try:
-            self.__init__(self.url)
-            self.connect()
-            self.run_forever()
-        except KeyboardInterrupt:
-            self.close()
+        self.setup()
+
 
     def received_message(self, m):
         print m
@@ -34,10 +44,5 @@ class DummyClient(WebSocketClient):
         #     self.close(reason='Bye bye')
 
 if __name__ == '__main__':
-    try:
-        # ws = DummyClient('ws://localhost:9000/', protocols=['http-only', 'chat'])
-        ws = DummyClient('ws://localhost:9000/ws')
-        ws.connect()
-        ws.run_forever()
-    except KeyboardInterrupt:
-        ws.close()
+    ws = DummyClient('ws://localhost:9000/ws')
+    ws.setup()
