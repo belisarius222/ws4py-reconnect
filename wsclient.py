@@ -3,16 +3,13 @@ from ws4py.client.threadedclient import WebSocketClient
 
 class DummyClient(WebSocketClient):
     def opened(self):
-        print "Opened."
-        def data_provider():
-            for i in range(1, 200, 25):
-                yield "#" * i
+        print("Opened.")
 
-        self.send(data_provider())
-
-        for i in range(0, 200, 25):
-            print i
-            self.send("*" * i)
+        while True:
+            stuffToSend = "*" * 20
+            print(stuffToSend)
+            self.send(stuffToSend)
+            time.sleep(2)
 
     def setup(self, timeout=1):
         try:
@@ -23,23 +20,23 @@ class DummyClient(WebSocketClient):
             self.close()
         except:
             newTimeout = timeout + 1
-            print "Timing out for %i seconds. . ." % newTimeout
+            print("Timing out for %i seconds. . ." % newTimeout)
             time.sleep(newTimeout)
-            print "Attempting reconnect. . ."
+            print("Attempting reconnect. . .")
             self.setup(newTimeout)
 
     def closed(self, code, reason=None):
-        print "Closed down", code, reason
-        print "Timing out for a bit. . ."
+        print("Closed down", code, reason)
+        print("Timing out for a bit. . .")
         time.sleep(3)
-        print "Reconnecting. . ."
+        print("Reconnecting. . .")
         # self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
         self.setup()
 
 
     def received_message(self, m):
-        print m
+        print(m)
         # if len(m) == 175:
         #     self.close(reason='Bye bye')
 
