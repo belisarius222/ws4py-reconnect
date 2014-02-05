@@ -1,13 +1,17 @@
-import time, socket
+import time, sys, socket
 from ws4py.client.threadedclient import WebSocketClient
+
+def printHard(*args):
+    print(*args)
+    sys.stdout.flush()
 
 class DummyClient(WebSocketClient):
     def opened(self):
-        print("Opened.")
+        printHard("Opened.")
 
         while True:
             stuffToSend = "*" * 20
-            print(stuffToSend)
+            printHard(stuffToSend)
             self.send(stuffToSend)
             time.sleep(2)
 
@@ -20,23 +24,23 @@ class DummyClient(WebSocketClient):
             self.close()
         except:
             newTimeout = timeout + 1
-            print("Timing out for %i seconds. . ." % newTimeout)
+            printHard("Timing out for %i seconds. . ." % newTimeout)
             time.sleep(newTimeout)
-            print("Attempting reconnect. . .")
+            printHard("Attempting reconnect. . .")
             self.setup(newTimeout)
 
     def closed(self, code, reason=None):
-        print("Closed down", code, reason)
-        print("Timing out for a bit. . .")
+        printHard("Closed down", code, reason)
+        printHard("Timing out for a bit. . .")
         time.sleep(3)
-        print("Reconnecting. . .")
+        printHard("Reconnecting. . .")
         # self.sock.shutdown(socket.SHUT_RDWR)
         self.sock.close()
         self.setup()
 
 
     def received_message(self, m):
-        print(m)
+        printHard(m)
         # if len(m) == 175:
         #     self.close(reason='Bye bye')
 
